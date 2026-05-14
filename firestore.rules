@@ -1,0 +1,142 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helpers ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && 
+             (request.auth.token.email == 'mobilesuit84@gmail.com' ||
+              (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+               get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'));
+    }
+
+    // --- Users ---
+    match /users/{userId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      allow create: if (isOwner(userId) || isAdmin()) && isValidUser(incoming());
+      allow update: if (isOwner(userId) || isAdmin()) && isValidUser(incoming());
+    }
+
+    // --- Rules (Regulations) ---
+    match /rules/{ruleId} {
+      allow read: if isSignedIn();
+      allow create: if isAdmin() && isValidRule(incoming());
+      allow update: if isAdmin() && isValidRule(incoming());
+      allow delete: if isAdmin();
+
+      // --- Rule History ---
+      match /history/{historyId} {
+        allow read: if isSignedIn();
+        allow create: if isAdmin();
+      }
+    }
+
+    function isValidUser(data) {
+      return data.email is string &&
+             (!('role' in data) || data.role in ['researcher', 'finance_officer', 'admin']);
+    }
+
+    function isValidRule(data) {
+      return data.title is string && data.title.size() > 0 &&
+             data.content is string &&
+             data.type in ['law', 'regulation', 'internal', 'guideline'] &&
+             (!('active' in data) || data.active is bool) &&
+             (!('sourceUrl' in data) || data.sourceUrl is string) &&
+             (!('lastModifiedBy' in data) || data.lastModifiedBy is string) &&
+             (!('createdAt' in data) || data.createdAt is timestamp || data.createdAt == request.time) &&
+             (!('updatedAt' in data) || data.updatedAt is timestamp || data.updatedAt == request.time);
+    }
+
+    // --- Projects ---
+    match /projects/{projectId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      allow create: if isSignedIn() && isValidProject(incoming());
+      allow update: if isSignedIn() && isValidProject(incoming());
+      
+      // --- Audit Items ---
+      match /auditItems/{itemId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn() && isValidAuditItem(incoming());
+        allow update: if isSignedIn() && (
+          isAdmin() ||
+          // Researchers can update their own items for 소명 (justification)
+          (existing().userId == request.auth.uid && incoming().diff(existing()).affectedKeys().hasAny(['status', 'userReason', 'updatedAt'])) ||
+          // Fallback schema check
+          isValidAuditItem(incoming()) || 
+          incoming().diff(existing()).affectedKeys().hasAny(['status', 'userReason', 'aiComment', 'updatedAt', 'receiptUrl'])
+        );
+        allow delete: if isAdmin();
+        
+        // --- Audit Logs ---
+        match /logs/{logId} {
+          allow read: if isSignedIn();
+          allow create: if isSignedIn() && isValidLog(incoming());
+        }
+      }
+    }
+
+    function isValidProject(data) {
+      return data.name is string && data.name.size() < 200 &&
+             data.piId is string &&
+             data.budgetTotal is number;
+    }
+
+    function isValidAuditItem(data) {
+      return data.description is string && data.description.size() < 1000 &&
+             data.amount is number &&
+             data.aiScore is number && data.aiScore >= 0 && data.aiScore <= 100 &&
+             data.status in ['정상', '검토필요', '소명중', '작성중'] &&
+             (!('id' in data) || data.id is string) &&
+             (!('projectId' in data) || data.projectId is string) &&
+             (!('userId' in data) || data.userId is string) &&
+             (!('category' in data) || data.category is string) &&
+             (!('date' in data) || data.date is string) &&
+             (!('aiComment' in data) || data.aiComment is string) &&
+             (!('receiptUrl' in data) || data.receiptUrl == null || data.receiptUrl is string) &&
+             (!('userReason' in data) || data.userReason is string) &&
+             (!('createdAt' in data) || data.createdAt is timestamp || data.createdAt is string) &&
+             (!('updatedAt' in data) || data.updatedAt is timestamp || data.updatedAt is string);
+    }
+
+    function isValidLog(data) {
+      return data.action is string &&
+             data.userId == request.auth.uid &&
+             data.itemId is string &&
+             (!('timestamp' in data) || data.timestamp is timestamp);
+    }
+
+    // --- Notifications ---
+    match /users/{userId}/notifications/{notificationId} {
+      allow read: if isOwner(userId);
+      allow update: if isOwner(userId) && incoming().diff(existing()).affectedKeys().hasOnly(['read']);
+      allow delete: if isOwner(userId);
+      allow create: if isSignedIn();
+    }
+  }
+}

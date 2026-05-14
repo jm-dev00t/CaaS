@@ -1,0 +1,83 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and role information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string", "enum": ["researcher", "finance_officer", "admin"] },
+        "organization": { "type": "string" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Project": {
+      "title": "Project",
+      "description": "R&D Project details",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "pi": { "type": "string" },
+        "piId": { "type": "string" },
+        "budgetTotal": { "type": "number" },
+        "budgetUsed": { "type": "number" },
+        "deadline": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "required": ["name", "piId", "budgetTotal"]
+    },
+    "AuditItem": {
+      "title": "Audit Item",
+      "description": "Expense record for audit",
+      "type": "object",
+      "properties": {
+        "projectId": { "type": "string" },
+        "date": { "type": "string" },
+        "category": { "type": "string" },
+        "description": { "type": "string" },
+        "amount": { "type": "number" },
+        "aiScore": { "type": "number" },
+        "status": { "type": "string" },
+        "aiComment": { "type": "string" },
+        "submittedBy": { "type": "string" },
+        "receiptUrl": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["projectId", "description", "amount", "aiScore"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "System alerts for users",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "type": { "type": "string", "enum": ["alert", "info", "deadline"] },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "title", "message"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "User documents"
+    },
+    "projects/{projectId}": {
+      "schema": "Project",
+      "description": "Project documents"
+    },
+    "projects/{projectId}/auditItems/{itemId}": {
+      "schema": "AuditItem",
+      "description": "Detailed audit items per project"
+    },
+    "users/{userId}/notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "User specific notifications"
+    }
+  }
+}
