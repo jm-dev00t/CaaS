@@ -1,11 +1,12 @@
 import { Card, CardContent } from "./ui/card";
 import { Progress } from "./ui/progress";
 import { Badge } from "./ui/badge";
-import { Wallet, Calendar, User, FileText, FileDown, Plus } from "lucide-react";
+import { Wallet, Calendar, User, FileText, FileDown, Plus, Loader2 } from "lucide-react";
 import { ProjectInfo, AuditItem } from "../types/dashboard";
 import { Button } from "./ui/button";
 import { useState } from "react";
 import { NewEntrySheet } from "./NewEntrySheet";
+import { generateAuditReport } from "../services/reportService";
 
 interface DashboardHeaderProps {
   project: ProjectInfo;
@@ -13,8 +14,18 @@ interface DashboardHeaderProps {
   items?: AuditItem[];
 }
 
-export function DashboardHeader({ project, projectId, items }: DashboardHeaderProps) {
+export function DashboardHeader({ project, projectId, items = [] }: DashboardHeaderProps) {
   const [isNewEntryOpen, setIsNewEntryOpen] = useState(false);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
+  const handleExportPdf = async () => {
+    setIsGeneratingPdf(true);
+    try {
+      await generateAuditReport(project, items, 'charts-section');
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
   const usagePercent = (project.budget.used / project.budget.total) * 100;
 
   return (
@@ -44,13 +55,14 @@ export function DashboardHeader({ project, projectId, items }: DashboardHeaderPr
         
         <div className="flex flex-wrap items-center gap-3 md:gap-4">
           <div className="flex items-center gap-3 flex-1 sm:flex-initial">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="h-10 md:h-11 text-[13px] md:text-[14px] font-semibold rounded-full border-[#d2d2d7] px-4 md:px-6 transition-all bg-white hover:bg-[#f5f5f7] text-[#1d1d1f] flex-1 sm:flex-initial"
-              onClick={() => window.print()}
+              onClick={handleExportPdf}
+              disabled={isGeneratingPdf}
             >
-              <FileDown className="w-4 h-4 mr-2" />
-              내보내기
+              {isGeneratingPdf ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileDown className="w-4 h-4 mr-2" />}
+              {isGeneratingPdf ? '생성 중...' : 'PDF 리포트'}
             </Button>
             <Button 
               className="h-10 md:h-11 bg-[#0066cc] text-white hover:bg-[#0071e3] text-[13px] md:text-[14px] font-semibold rounded-full transition-all px-6 md:px-8 active:scale-95 flex-1 sm:flex-initial"

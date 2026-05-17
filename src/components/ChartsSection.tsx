@@ -21,7 +21,7 @@ interface ChartsSectionProps {
 
 export function ChartsSection({ weeklyData, categoryData }: ChartsSectionProps) {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div id="charts-section" className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <Card className="shadow-sm border border-[#d2d2d7] bg-white rounded-[24px] overflow-hidden">
         <CardHeader className="p-7 pb-3 border-none flex flex-row items-center justify-between space-y-0">
           <div>
