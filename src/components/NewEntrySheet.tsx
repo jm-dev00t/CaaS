@@ -11,7 +11,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { Upload, Loader2, Plus, AlertCircle, ImageIcon, Sparkles, Wand2 } from "lucide-react";
+import { Upload, Loader2, Plus, AlertCircle, ImageIcon, Sparkles, Wand2, Camera } from "lucide-react";
 import { addAuditItem } from "../services/dataService";
 import { analyzeReceipt, analyzeAuditItem } from "../services/aiService";
 import { cn } from "../lib/utils";
@@ -36,6 +36,7 @@ export function NewEntrySheet({ isOpen, onClose, projectId }: NewEntrySheetProps
   });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const categories = ["회의비", "연구장비비", "연구재료비", "소모품비", "국내여비", "국외여비", "전문가 활용비", "인건비", "기타"];
 
@@ -81,6 +82,44 @@ export function NewEntrySheet({ isOpen, onClose, projectId }: NewEntrySheetProps
       } catch (err) {
         console.error("AI Analysis failed", err);
         alert("AI 영수증 분석 중 오류가 발생했습니다. 직접 입력해주세요.");
+      } finally {
+        setIsAnalyzing(false);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleCameraCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const base64 = event.target?.result as string;
+      setReceiptUrl(base64);
+      setIsAnalyzing(true);
+      setAutoFilledFields(new Set());
+      try {
+        const analysis = await analyzeReceipt(base64);
+        if (analysis.isLikelyReceipt) {
+          setAiAnalysis(analysis);
+          const newFilled = new Set<string>();
+          if (analysis.amount) newFilled.add('amount');
+          if (analysis.date) newFilled.add('date');
+          if (analysis.vendor) newFilled.add('description');
+          if (analysis.suggestedCategory) newFilled.add('category');
+          setAutoFilledFields(newFilled);
+          setFormData(prev => ({
+            ...prev,
+            amount: analysis.amount ? analysis.amount.toString() : prev.amount,
+            date: analysis.date || prev.date,
+            category: analysis.suggestedCategory || prev.category,
+            description: analysis.items && analysis.items.length > 0
+              ? `${analysis.vendor} (${analysis.items.slice(0, 2).join(', ')}${analysis.items.length > 2 ? ' 외' : ''})`
+              : `${analysis.vendor} 지출 내역`,
+          }));
+        }
+      } catch (err) {
+        console.error('Camera capture analysis error:', err);
       } finally {
         setIsAnalyzing(false);
       }
@@ -264,14 +303,31 @@ export function NewEntrySheet({ isOpen, onClose, projectId }: NewEntrySheetProps
                </div>
             </div>
 
-            <input 
+            <input
               id="receipt-upload"
-              type="file" 
-              ref={fileInputRef} 
-              className="hidden" 
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
               accept="image/*"
               onChange={handleFileUpload}
             />
+            <input
+              ref={cameraInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="hidden"
+              onChange={handleCameraCapture}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              className="sm:hidden h-11 rounded-2xl border-[#d2d2d7] flex items-center gap-2 px-4"
+              onClick={() => cameraInputRef.current?.click()}
+            >
+              <Camera className="w-4 h-4 text-[#0066cc]" />
+              <span className="text-[14px] font-semibold">카메라 촬영</span>
+            </Button>
           </div>
 
           <div className="space-y-2">
