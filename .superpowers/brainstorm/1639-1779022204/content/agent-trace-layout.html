@@ -1,0 +1,105 @@
+<h2>Agent Trace 패널 — 어떤 레이아웃으로 보여줄까요?</h2>
+<p class="subtitle">영수증 업로드 → OCR → RAG → 위반탐지 → 사유서 → 결재라우팅 과정을 시각화하는 패널입니다</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="display:flex;gap:0;height:180px;font-size:11px;border:1px solid #e5e5e7;border-radius:12px;overflow:hidden">
+        <div style="width:62%;background:#f5f5f7;padding:12px;border-right:1px solid #e5e5e7">
+          <div style="background:#fff;border-radius:8px;padding:8px;margin-bottom:6px;border:1px solid #d2d2d7">
+            <div style="font-weight:600;color:#1d1d1f;margin-bottom:4px">📄 정산 원장</div>
+            <div style="color:#86868b;font-size:10px">항목 목록이 여기에...</div>
+          </div>
+          <div style="background:#fff;border-radius:8px;padding:8px;border:1px solid #d2d2d7">
+            <div style="font-weight:600;color:#1d1d1f;margin-bottom:4px">차트 섹션</div>
+          </div>
+        </div>
+        <div style="width:38%;background:#fff;padding:12px">
+          <div style="font-weight:700;color:#1d1d1f;margin-bottom:8px;font-size:12px">AI Trace</div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <div style="background:#e3f2fd;border-radius:6px;padding:6px;font-size:10px;color:#0066cc">✅ 1. OCR 파싱 완료 (0.8s)</div>
+            <div style="background:#e3f2fd;border-radius:6px;padding:6px;font-size:10px;color:#0066cc">✅ 2. 규정 RAG 검색 (1.2s)</div>
+            <div style="background:#fff3cd;border-radius:6px;padding:6px;font-size:10px;color:#856404">⚠️ 3. 위반 항목 감지 중...</div>
+            <div style="background:#f5f5f7;border-radius:6px;padding:6px;font-size:10px;color:#86868b">⏳ 4. 사유서 생성</div>
+            <div style="background:#f5f5f7;border-radius:6px;padding:6px;font-size:10px;color:#86868b">⏳ 5. 결재 라우팅</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A. 사이드 패널 (우측 고정)</h3>
+      <p>대시보드 오른쪽에 항상 표시. 분석 중인 항목 클릭 시 trace 업데이트. 대시보드와 동시에 보임.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="height:180px;font-size:11px;border:1px solid #e5e5e7;border-radius:12px;overflow:hidden;background:#fff;padding:16px">
+        <div style="font-weight:700;color:#1d1d1f;margin-bottom:10px;font-size:13px">🤖 AI 감사 실행 중 — 회식비 ₩450,000</div>
+        <div style="display:flex;gap:8px;align-items:flex-start">
+          <div style="display:flex;flex-direction:column;gap:2px;align-items:center">
+            <div style="width:28px;height:28px;background:#0066cc;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px">1</div>
+            <div style="width:2px;height:20px;background:#d2d2d7"></div>
+            <div style="width:28px;height:28px;background:#0066cc;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px">2</div>
+            <div style="width:2px;height:20px;background:#d2d2d7"></div>
+            <div style="width:28px;height:28px;background:#ff9f0a;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px">3</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:14px">
+            <div>
+              <div style="font-weight:600;font-size:11px;color:#1d1d1f">OCR 파싱</div>
+              <div style="font-size:10px;color:#86868b">가맹점: 강남구청 인근 한식당 | 금액: ₩450,000 | 날짜: 2026-05-10</div>
+            </div>
+            <div>
+              <div style="font-weight:600;font-size:11px;color:#1d1d1f">규정 RAG 검색</div>
+              <div style="font-size:10px;color:#86868b">적용 규정: 회의비 집행 기준 제3-2조 (1인당 3만원 한도)</div>
+            </div>
+            <div>
+              <div style="font-weight:600;font-size:11px;color:#ff9f0a">⚠️ 위반 감지</div>
+              <div style="font-size:10px;color:#86868b">5인 기준 1인당 ₩90,000 — 한도 초과 300%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B. 전체화면 슬라이드업 모달</h3>
+      <p>항목 선택 시 전체화면으로 trace 과정 표시. 스텝별 상세 내용과 근거 인용까지. 가장 임팩트 강함.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="height:180px;font-size:11px;border:1px solid #e5e5e7;border-radius:12px;overflow:hidden;background:#fff">
+        <div style="background:#f5f5f7;padding:8px 12px;border-bottom:1px solid #e5e5e7;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-weight:600;font-size:12px;color:#1d1d1f">회의비 | ₩450,000 | 검토필요</span>
+          <span style="font-size:10px;color:#0066cc;cursor:pointer">▼ AI 분석 펼치기</span>
+        </div>
+        <div style="padding:12px;background:#f0f8ff;border-bottom:1px solid #e5e5e7">
+          <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">
+            <div style="background:#0066cc;color:#fff;border-radius:4px;padding:2px 6px;font-size:9px;font-weight:700">OCR</div>
+            <span style="font-size:10px;color:#1d1d1f">강남구청 인근 한식당, 5인, 2026-05-10</span>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">
+            <div style="background:#34c759;color:#fff;border-radius:4px;padding:2px 6px;font-size:9px;font-weight:700">RAG</div>
+            <span style="font-size:10px;color:#1d1d1f">회의비 집행 기준 제3-2조 적용</span>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <div style="background:#ff3b30;color:#fff;border-radius:4px;padding:2px 6px;font-size:9px;font-weight:700">위반</div>
+            <span style="font-size:10px;color:#ff3b30">1인당 ₩90K → 한도(₩30K) 300% 초과</span>
+          </div>
+        </div>
+        <div style="padding:8px 12px;background:#fff">
+          <div style="color:#86868b;font-size:10px">동일 항목: 회의비 | 연구직접비 | 정상 항목 7건</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C. 테이블 행 인라인 확장</h3>
+      <p>감사 피드 행을 클릭하면 바로 아래에 trace 확장. 컨텍스트 유지. 여러 항목을 동시에 펼쳐서 비교 가능.</p>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:16px">포트폴리오 시연 시나리오: 평가자에게 "이 항목 클릭해보세요" → AI가 단계별로 판단하는 과정이 보임</p>

@@ -1,0 +1,152 @@
+<h2>패턴 탐지 대시보드 — 어떤 구성으로 보여줄까요?</h2>
+<p class="subtitle">분할결제·중복자문·주말회식 등 이상 패턴을 시각화하는 전용 페이지입니다</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="height:200px;font-size:10px;border:1px solid #e5e5e7;border-radius:12px;overflow:hidden;background:#f5f5f7;padding:10px;display:flex;flex-direction:column;gap:6px">
+        <div style="font-weight:700;color:#1d1d1f;font-size:11px">이상징후 탐지 — 3건 감지됨</div>
+        <div style="display:flex;gap:6px;flex:1">
+          <!-- Timeline left -->
+          <div style="flex:1;background:#fff;border-radius:8px;padding:8px;border:1px solid #e5e5e7">
+            <div style="font-weight:600;color:#86868b;font-size:9px;margin-bottom:6px">타임라인</div>
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <div style="display:flex;gap:4px;align-items:center">
+                <div style="width:60px;font-size:9px;color:#86868b">05/10</div>
+                <div style="flex:1;height:6px;background:#ff3b30;border-radius:3px" title="분할결제"></div>
+                <div style="font-size:9px;color:#ff3b30">분할</div>
+              </div>
+              <div style="display:flex;gap:4px;align-items:center">
+                <div style="width:60px;font-size:9px;color:#86868b">05/11</div>
+                <div style="width:40%;height:6px;background:#34c759;border-radius:3px"></div>
+              </div>
+              <div style="display:flex;gap:4px;align-items:center">
+                <div style="width:60px;font-size:9px;color:#86868b">05/12 (일)</div>
+                <div style="flex:1;height:6px;background:#ff9f0a;border-radius:3px"></div>
+                <div style="font-size:9px;color:#ff9f0a">주말</div>
+              </div>
+              <div style="display:flex;gap:4px;align-items:center">
+                <div style="width:60px;font-size:9px;color:#86868b">05/14</div>
+                <div style="width:70%;height:6px;background:#34c759;border-radius:3px"></div>
+              </div>
+              <div style="display:flex;gap:4px;align-items:center">
+                <div style="width:60px;font-size:9px;color:#86868b">05/15</div>
+                <div style="flex:1;height:6px;background:#ff3b30;border-radius:3px"></div>
+                <div style="font-size:9px;color:#ff3b30">중복</div>
+              </div>
+            </div>
+          </div>
+          <!-- Alert cards right -->
+          <div style="width:45%;display:flex;flex-direction:column;gap:4px">
+            <div style="background:#fff5f5;border-radius:6px;padding:6px;border:1px solid #ffcdd2">
+              <div style="font-weight:700;color:#ff3b30;font-size:9px">🚨 분할결제 의심</div>
+              <div style="color:#86868b;font-size:9px">강남 A식당 | 3회 × ₩149K</div>
+            </div>
+            <div style="background:#fff8e1;border-radius:6px;padding:6px;border:1px solid #ffe082">
+              <div style="font-weight:700;color:#ff9f0a;font-size:9px">⚠️ 주말 회식</div>
+              <div style="color:#86868b;font-size:9px">회의비 | 일요일 집행</div>
+            </div>
+            <div style="background:#fff5f5;border-radius:6px;padding:6px;border:1px solid #ffcdd2">
+              <div style="font-weight:700;color:#ff3b30;font-size:9px">🚨 동일 자문료</div>
+              <div style="color:#86868b;font-size:9px">김○○ 강사 | 월 2회 청구</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A. 타임라인 + 알림 카드</h3>
+      <p>시간축으로 집행 패턴 시각화. 이상 항목은 우측 알림 카드로 하이라이트. 직관적이고 읽기 쉬움.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="height:200px;font-size:10px;border:1px solid #e5e5e7;border-radius:12px;overflow:hidden;background:#1d1d1f;padding:10px">
+        <div style="font-weight:700;color:#fff;font-size:11px;margin-bottom:8px">관계 네트워크 — 이상 클러스터</div>
+        <div style="position:relative;height:155px;display:flex;align-items:center;justify-content:center">
+          <!-- Network graph simulation -->
+          <svg width="100%" height="100%" viewBox="0 0 280 150">
+            <!-- Edges -->
+            <line x1="140" y1="75" x2="80" y2="40" stroke="#ff3b30" stroke-width="2" opacity="0.8"/>
+            <line x1="140" y1="75" x2="90" y2="110" stroke="#ff3b30" stroke-width="2" opacity="0.8"/>
+            <line x1="140" y1="75" x2="105" y2="75" stroke="#ff3b30" stroke-width="3" opacity="1"/>
+            <line x1="140" y1="75" x2="200" y2="35" stroke="#34c759" stroke-width="1" opacity="0.4"/>
+            <line x1="140" y1="75" x2="210" y2="100" stroke="#34c759" stroke-width="1" opacity="0.4"/>
+            <line x1="140" y1="75" x2="230" y2="65" stroke="#ff9f0a" stroke-width="1.5" opacity="0.6"/>
+            <!-- Center node (vendor) -->
+            <circle cx="140" cy="75" r="16" fill="#ff3b30" opacity="0.9"/>
+            <text x="140" y="79" text-anchor="middle" fill="white" font-size="8">강남식당</text>
+            <!-- Split payment nodes -->
+            <circle cx="80" cy="40" r="10" fill="#ff6b6b"/>
+            <text x="80" y="44" text-anchor="middle" fill="white" font-size="7">₩149K</text>
+            <circle cx="90" cy="110" r="10" fill="#ff6b6b"/>
+            <text x="90" y="114" text-anchor="middle" fill="white" font-size="7">₩149K</text>
+            <circle cx="105" cy="75" r="10" fill="#ff6b6b"/>
+            <text x="105" y="79" text-anchor="middle" fill="white" font-size="7">₩149K</text>
+            <!-- Normal nodes -->
+            <circle cx="200" cy="35" r="8" fill="#34c759" opacity="0.7"/>
+            <circle cx="210" cy="100" r="8" fill="#34c759" opacity="0.7"/>
+            <circle cx="230" cy="65" r="10" fill="#ff9f0a" opacity="0.8"/>
+            <text x="230" y="69" text-anchor="middle" fill="white" font-size="7">주말</text>
+            <!-- Label -->
+            <text x="140" y="140" text-anchor="middle" fill="#86868b" font-size="8">빨간 클러스터 = 분할결제 의심 그룹</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B. 관계 네트워크 그래프</h3>
+      <p>가맹점·연구자·금액 간 관계를 노드-엣지로 표시. 분할결제 클러스터가 시각적으로 즉시 드러남. 기술력 어필 최강.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="height:200px;font-size:10px;border:1px solid #e5e5e7;border-radius:12px;overflow:hidden;background:#f5f5f7;padding:10px;display:flex;flex-direction:column;gap:6px">
+        <div style="font-weight:700;color:#1d1d1f;font-size:11px">패턴 스코어카드</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;flex:1">
+          <div style="background:#fff;border-radius:8px;padding:8px;border-left:3px solid #ff3b30">
+            <div style="font-size:9px;color:#86868b;margin-bottom:2px">분할결제</div>
+            <div style="font-size:18px;font-weight:700;color:#ff3b30">2건</div>
+            <div style="width:100%;background:#f5f5f7;border-radius:2px;height:4px;margin-top:4px">
+              <div style="width:80%;background:#ff3b30;height:4px;border-radius:2px"></div>
+            </div>
+          </div>
+          <div style="background:#fff;border-radius:8px;padding:8px;border-left:3px solid #ff9f0a">
+            <div style="font-size:9px;color:#86868b;margin-bottom:2px">주말 집행</div>
+            <div style="font-size:18px;font-weight:700;color:#ff9f0a">3건</div>
+            <div style="width:100%;background:#f5f5f7;border-radius:2px;height:4px;margin-top:4px">
+              <div style="width:45%;background:#ff9f0a;height:4px;border-radius:2px"></div>
+            </div>
+          </div>
+          <div style="background:#fff;border-radius:8px;padding:8px;border-left:3px solid #ff3b30">
+            <div style="font-size:9px;color:#86868b;margin-bottom:2px">중복 자문료</div>
+            <div style="font-size:18px;font-weight:700;color:#ff3b30">1건</div>
+            <div style="width:100%;background:#f5f5f7;border-radius:2px;height:4px;margin-top:4px">
+              <div style="width:30%;background:#ff3b30;height:4px;border-radius:2px"></div>
+            </div>
+          </div>
+          <div style="background:#fff;border-radius:8px;padding:8px;border-left:3px solid #0066cc">
+            <div style="font-size:9px;color:#86868b;margin-bottom:2px">outlier (z>2)</div>
+            <div style="font-size:18px;font-weight:700;color:#0066cc">4건</div>
+            <div style="width:100%;background:#f5f5f7;border-radius:2px;height:4px;margin-top:4px">
+              <div style="width:60%;background:#0066cc;height:4px;border-radius:2px"></div>
+            </div>
+          </div>
+        </div>
+        <div style="background:#fff3cd;border-radius:6px;padding:6px;text-align:center">
+          <span style="font-size:9px;color:#856404">전체 리스크 스코어: 68 / 100 — 주의 필요</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C. KPI 스코어카드</h3>
+      <p>패턴 유형별 건수 + 리스크 점수를 카드로 요약. 빠르게 전체 현황 파악 가능. 경영진 보고용 느낌.</p>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:16px">💡 A+B 조합도 가능 — 스코어카드 상단 + 아래 네트워크 그래프</p>
