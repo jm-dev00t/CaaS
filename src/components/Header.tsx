@@ -26,14 +26,9 @@ export function Header({ activeView, onViewChange }: HeaderProps) {
           </SheetTrigger>
           <SheetContent side="left" className="p-0 w-[260px] border-none">
             <SheetTitle className="sr-only">모바일 메뉴</SheetTitle>
-            <Sidebar 
+            <Sidebar
               className="w-full border-none shadow-none"
-              currentRole={profile?.role} 
-              activeView={activeView || "dashboard"}
-              onViewChange={(view) => {
-                onViewChange?.(view);
-                setIsMobileMenuOpen(false);
-              }}
+              currentRole={profile?.role}
             />
           </SheetContent>
         </Sheet>

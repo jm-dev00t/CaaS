@@ -1,10 +1,10 @@
 import { cn } from "@/lib/utils";
-import { 
-  LayoutDashboard, 
-  FileCheck2, 
-  BarChart3, 
-  Settings, 
-  LogOut, 
+import {
+  LayoutDashboard,
+  FileCheck2,
+  BarChart3,
+  Settings,
+  LogOut,
   Database,
   History,
   ShieldCheck,
@@ -15,22 +15,35 @@ import {
   FileText,
   BookOpen,
   Info,
+  AlertTriangle,
 } from "lucide-react";
 import { auth } from "../lib/firebase";
 import { sendNotification } from "../services/dataService";
 import { useAuth } from "../contexts/AuthContext";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Button } from "./ui/button";
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface SidebarProps {
   className?: string;
   currentRole?: string;
-  activeView: string;
-  onViewChange: (view: string) => void;
 }
 
-export function Sidebar({ className, currentRole, activeView, onViewChange }: SidebarProps) {
+export function Sidebar({ className, currentRole }: SidebarProps) {
   const { user, updateProfile } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const VIEW_PATH: Record<string, string> = {
+    dashboard: '/', settlement: '/settlement', verification: '/verification',
+    budget: '/budget', evidence: '/evidence', stats: '/stats',
+    'receipt-gen': '/receipt-gen', 'org-management': '/org-management',
+    'rule-management': '/rule-management', 'compliance-guide': '/compliance-guide',
+    patterns: '/patterns',
+  };
+
+  const activeView = Object.entries(VIEW_PATH).find(([, path]) => path === location.pathname)?.[0] ?? 'dashboard';
+  const onViewChange = (view: string) => navigate(VIEW_PATH[view] ?? '/');
 
   const navItems = [
     { id: "dashboard", icon: LayoutDashboard, label: "대시보드" },
@@ -42,6 +55,7 @@ export function Sidebar({ className, currentRole, activeView, onViewChange }: Si
     { id: "budget", icon: Database, label: "예산 관리", roles: ["admin", "finance_officer"] },
     { id: "evidence", icon: History, label: "증빙 기록", roles: ["admin", "finance_officer", "researcher"] },
     { id: "stats", icon: BarChart3, label: "통계 분석", roles: ["admin", "finance_officer"] },
+    { id: "patterns", icon: AlertTriangle, label: "패턴 탐지", roles: ["admin", "finance_officer"] },
     { id: "receipt-gen", icon: Ticket, label: "테스트 영수증" },
   ];
 
@@ -62,13 +76,14 @@ export function Sidebar({ className, currentRole, activeView, onViewChange }: Si
 
   const handleLogout = () => {
     auth.signOut();
+    navigate('/');
   };
 
   const triggerDemoAlert = async () => {
     if (!user) return;
     await sendNotification(
-      user.uid, 
-      "AI 정밀 검토 알림", 
+      user.uid,
+      "AI 정밀 검토 알림",
       "법인카드 집행 내역 #4928에서 분할 결제 의심 정황이 발견되었습니다.",
       "alert"
     );
@@ -119,21 +134,21 @@ export function Sidebar({ className, currentRole, activeView, onViewChange }: Si
           </PopoverContent>
         </Popover>
       </div>
-      
+
       <nav className="flex-1 px-4 py-6 space-y-0.5">
         <div className="px-4 py-2 text-[11px] font-bold uppercase tracking-wider text-[#86868b] mb-1">메뉴</div>
         {navItems.map((item) => {
           if (item.roles && currentRole && !item.roles.includes(currentRole)) return null;
           const isActive = activeView === item.id;
-          
+
           return (
             <button
               key={item.id}
               onClick={() => onViewChange(item.id)}
               className={cn(
                 "w-full flex items-center gap-3.5 px-4 py-2.5 rounded-xl transition-all duration-200 group text-[14px] font-medium",
-                isActive 
-                  ? "bg-[#0066cc] text-white shadow-sm" 
+                isActive
+                  ? "bg-[#0066cc] text-white shadow-sm"
                   : "text-[#424245] hover:bg-[#e8e8ed] hover:text-[#1d1d1f]"
               )}
             >
@@ -145,7 +160,7 @@ export function Sidebar({ className, currentRole, activeView, onViewChange }: Si
       </nav>
 
       <div className="p-6 mt-auto border-t border-[#e5e5e7]">
-        <button 
+        <button
           onClick={handleLogout}
           className="flex items-center gap-3 px-4 py-2 text-[#86868b] hover:text-[#ff3b30] transition-colors w-full text-[13px] font-medium group"
         >
