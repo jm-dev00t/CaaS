@@ -1,6 +1,13 @@
-import { GoogleGenAI, Type } from "@google/genai";
+// Google Gemini AI를 활용한 영수증 분석 및 감사 항목 평가 서비스
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+import { GoogleGenAI, Type } from "@google/genai";
+import { findMatchingRegulations, buildRegulationContext } from './regulationService';
+
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY as string | undefined;
+if (!apiKey) {
+  console.warn('[aiService] VITE_GEMINI_API_KEY 미설정 — AI 기능 비활성화. .env.example 참조.');
+}
+const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
 export interface ReceiptAnalysis {
   vendor: string;
@@ -16,16 +23,17 @@ export interface AuditAnalysis {
   score: number;
   status: '정상' | '검토필요';
   comment: string;
+  regulationCitations?: string[];
 }
 
 export async function analyzeReceipt(base64Image: string): Promise<ReceiptAnalysis> {
-  // Remove data:image/...;base64, prefix if present
+  if (!ai) throw new Error('AI 서비스가 설정되지 않았습니다. VITE_GEMINI_API_KEY를 .env에 추가하세요.');
   const base64Data = base64Image.split(',')[1] || base64Image;
 
   const categories = ["회의비", "연구장비비", "연구재료비", "소모품비", "국내여비", "국외여비", "전문가 활용비", "인건비", "기타"];
 
   const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
+    model: "gemini-2.0-flash",
     contents: [
       {
         parts: [
@@ -36,7 +44,7 @@ export async function analyzeReceipt(base64Image: string): Promise<ReceiptAnalys
             },
           },
           {
-            text: `Analyze this receipt image for research funding audit. 
+            text: `Analyze this receipt image for research funding audit.
             Extract:
             1. vendor name
             2. date (YYYY-MM-DD)
@@ -56,7 +64,7 @@ export async function analyzeReceipt(base64Image: string): Promise<ReceiptAnalys
           vendor: { type: Type.STRING },
           date: { type: Type.STRING },
           amount: { type: Type.NUMBER },
-          items: { 
+          items: {
             type: Type.ARRAY,
             items: { type: Type.STRING }
           },
@@ -78,29 +86,33 @@ export async function analyzeReceipt(base64Image: string): Promise<ReceiptAnalys
 }
 
 export async function analyzeAuditItem(
-  category: string, 
-  description: string, 
-  amount: number, 
+  category: string,
+  description: string,
+  amount: number,
   receiptData?: ReceiptAnalysis
 ): Promise<AuditAnalysis> {
+  if (!ai) throw new Error('AI 서비스가 설정되지 않았습니다.');
+
+  const matches = findMatchingRegulations(category, description);
+  const regulationContext = buildRegulationContext(matches);
+  const citations = matches.map(m => `${m.regulation.article} ${m.regulation.title}`);
+
   const prompt = `
-    Audit this research fund expenditure for a "Researcher" role in a university project.
+    Audit this research fund expenditure for a university project.
     Category: ${category}
     Description: ${description}
     Amount: ${amount}
-    ${receiptData ? `Receipt Data: Vendor: ${receiptData.vendor}, Amount: ${receiptData.amount}, Date: ${receiptData.date}, Items: ${receiptData.items?.join(', ')}` : 'No electronic receipt provided.'}
+    ${receiptData ? `Receipt: Vendor: ${receiptData.vendor}, Amount: ${receiptData.amount}, Items: ${receiptData.items?.join(', ')}` : 'No receipt provided.'}
 
-    Rules to check:
-    1. Does the description match the category?
-    2. Is the amount reasonable for the category? (e.g., millions for "Meeting Expenses" is suspicious)
-    3. If receipt data is provided, does it match the input amount and description?
-    4. Flag potential misuse: duplicate consultancies, excessive travel without details, personal use items.
+    Applicable Regulations:
+    ${regulationContext}
 
-    Return a score (0-100), a status ('정상' or '검토필요'), and a concise comment in Korean.
+    Check: Does this comply with the above regulations? Flag violations with specific article references.
+    Return score (0-100), status ('정상' or '검토필요'), and Korean comment citing specific article numbers.
   `;
 
   const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
+    model: "gemini-2.0-flash",
     contents: prompt,
     config: {
       responseMimeType: "application/json",
@@ -108,7 +120,7 @@ export async function analyzeAuditItem(
         type: Type.OBJECT,
         properties: {
           score: { type: Type.NUMBER },
-          status: { 
+          status: {
             type: Type.STRING,
             enum: ['정상', '검토필요']
           },
@@ -120,18 +132,22 @@ export async function analyzeAuditItem(
   });
 
   try {
-    return JSON.parse(response.text);
+    const parsed = JSON.parse(response.text);
+    return { ...parsed, regulationCitations: citations };
   } catch (e) {
     console.error("AI Audit Parse Error:", e);
     return {
       score: 50,
       status: '검토필요',
-      comment: 'AI 분석 중 오류가 발생했습니다. 수동 검토가 필요합니다.'
+      comment: 'AI 분석 중 오류가 발생했습니다. 수동 검토가 필요합니다.',
+      regulationCitations: citations,
     };
   }
 }
 
 export async function explainAuditResult(item: any): Promise<string> {
+  if (!ai) throw new Error('AI 서비스가 설정되지 않았습니다.');
+
   const prompt = `
     Explain the following research fund audit record to a researcher.
     Item: ${item.description}
@@ -147,7 +163,7 @@ export async function explainAuditResult(item: any): Promise<string> {
   `;
 
   const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
+    model: "gemini-2.0-flash",
     contents: prompt
   });
 

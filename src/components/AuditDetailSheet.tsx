@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import {
   Sheet,
   SheetContent,
@@ -37,6 +37,7 @@ import { generateAuditJustification } from "../services/geminiService";
 import { useAuth } from "../contexts/AuthContext";
 import { updateAuditStatus, updateAuditReceipt, subscribeToAuditLogs } from "../services/dataService";
 import { explainAuditResult } from "../services/aiService";
+import { findMatchingRegulations, formatCitation } from "../services/regulationService";
 import ReactMarkdown from "react-markdown";
 
 interface AuditDetailSheetProps {
@@ -56,6 +57,13 @@ export function AuditDetailSheet({ item, isOpen, onClose, autoExplain }: AuditDe
   const [explanation, setExplanation] = useState<string | null>(null);
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const displayCitations = useMemo(() => {
+    if (!item) return [];
+    if (item.regulationCitations?.length) return item.regulationCitations;
+    return findMatchingRegulations(item.category, item.description)
+      .map(m => formatCitation(m.regulation));
+  }, [item]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -246,6 +254,17 @@ export function AuditDetailSheet({ item, isOpen, onClose, autoExplain }: AuditDe
                 <p className="text-[15px] font-semibold text-foreground/80 leading-relaxed">
                   {item.aiComment || "분석 대기 중... AI 엔진이 가이드라인 적합성을 검토하고 있습니다."}
                 </p>
+
+                {displayCitations.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    <span className="text-[11px] font-semibold text-[#86868b] uppercase tracking-wide w-full">근거 규정</span>
+                    {displayCitations.map((cite, i) => (
+                      <span key={i} className="px-2.5 py-1 bg-[#e3f2fd] text-[#0066cc] rounded-full text-[11px] font-semibold">
+                        {cite}
+                      </span>
+                    ))}
+                  </div>
+                )}
 
                 {canAppeal && !justification && (
                   <div className="mt-8 pt-6 border-t border-border/40 flex flex-col sm:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-bottom-2 duration-500">

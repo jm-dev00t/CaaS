@@ -35,6 +35,7 @@ export interface AuditItem {
   status: AuditStatus;
   receiptUrl?: string;
   aiComment?: string;
+  regulationCitations?: string[];
   userReason?: string;
   updatedAt?: any;
 }
