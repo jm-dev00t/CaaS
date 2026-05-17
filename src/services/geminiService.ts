@@ -1,8 +1,11 @@
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY as string | undefined;
+if (!apiKey) console.warn('[geminiService] VITE_GEMINI_API_KEY 미설정');
+const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
 export async function generateAuditJustification(item: any): Promise<string> {
+  if (!ai) return 'AI 서비스가 설정되지 않았습니다. VITE_GEMINI_API_KEY를 .env에 추가하세요.';
   const prompt = `
     당신은 KAIST 등 주요 공공 연구기관의 연구비 정산 행정 전문가입니다. 
     현재 진행 중인 프로젝트는 '차세대 AI 의료 진단 플랫폼 개발'과 같은 **고도의 인공지능(AI) 연구개발(R&D)** 과제입니다.

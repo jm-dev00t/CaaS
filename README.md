@@ -35,3 +35,13 @@
 
 ---
 *본 시스템은 국가연구개발혁신법 및 관련 가이드라인을 준수하여 설계되었습니다.*
+
+## 🔐 환경 변수 설정
+
+```bash
+cp .env.example .env
+# .env를 열어 실제 키 값 입력
+```
+
+> **보안 주의:** `VITE_` 접두사 변수는 브라우저 번들에 포함됩니다.
+> 프로덕션 배포 시 Firebase Cloud Functions 또는 Vercel Edge Function으로 API 키를 서버 측에서 관리하세요.
