@@ -24,9 +24,10 @@ import { subscribeToAuditItems, seedInitialData } from "./services/dataService";
 import { AuditItem } from "./types/dashboard";
 import { cn } from "@/lib/utils";
 import { EvidenceRecordView } from "./components/EvidenceRecordView";
+import { PatternDetectionView } from "./components/PatternDetectionView";
 
 function DashboardContent() {
-  const { user, profile, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading, isDemoMode, enterDemoMode } = useAuth();
   const [items, setItems] = useState<AuditItem[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -55,28 +56,28 @@ function DashboardContent() {
   useEffect(() => {
     if (!user) return;
 
-    // Start mock notification service
     import("./services/mockNotificationService").then(({ MockNotificationService }) => {
       MockNotificationService.getInstance().start(user.uid);
     });
 
-    // Seed data if collection is empty
-    seedInitialData(projectId);
-
-    // Subscribe to items
-    const unsubscribe = subscribeToAuditItems(projectId, (newItems) => {
-      setItems(newItems);
-      setDataLoading(false);
-      setIsRefreshing(false);
-    });
-
-    return () => {
-      unsubscribe();
-      import("./services/mockNotificationService").then(({ MockNotificationService }) => {
-        MockNotificationService.getInstance().stop();
+    if (!isDemoMode) {
+      seedInitialData(projectId);
+      const unsubscribe = subscribeToAuditItems(projectId, (newItems) => {
+        setItems(newItems);
+        setDataLoading(false);
+        setIsRefreshing(false);
       });
-    };
-  }, [user]);
+      return () => {
+        unsubscribe();
+        import("./services/mockNotificationService").then(({ MockNotificationService }) => {
+          MockNotificationService.getInstance().stop();
+        });
+      };
+    } else {
+      setItems(auditItems);
+      setDataLoading(false);
+    }
+  }, [user, isDemoMode]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -123,6 +124,21 @@ function DashboardContent() {
             <LogIn className="w-5 h-5" />
             Google 계정으로 시작하기
           </Button>
+          <div className="mt-4">
+            <div className="flex items-center gap-3 my-6">
+              <div className="flex-1 h-px bg-[#e5e5e7]" />
+              <span className="text-[12px] text-[#86868b] font-medium">또는</span>
+              <div className="flex-1 h-px bg-[#e5e5e7]" />
+            </div>
+            <Button
+              variant="outline"
+              onClick={enterDemoMode}
+              className="w-full h-12 border-[#0066cc] text-[#0066cc] hover:bg-[#e3f2fd] font-semibold text-[15px] flex items-center justify-center gap-2 rounded-full transition-all active:scale-95"
+            >
+              ✨ 데모로 체험하기
+            </Button>
+            <p className="text-[11px] text-[#86868b] text-center mt-3">저장되지 않는 읽기 전용 체험 모드</p>
+          </div>
           <div className="mt-10 pt-8 border-t border-[#e5e5e7]">
             <p className="text-[12px] font-semibold text-[#86868b] uppercase tracking-widest">기업 수준의 보안 및 암호화 적용됨</p>
           </div>
@@ -150,7 +166,7 @@ function DashboardContent() {
                 <main className="flex-1 overflow-y-auto outline-none custom-scrollbar pb-16">
                   <div className="max-w-[1440px] mx-auto p-4 md:p-10 space-y-8 md:space-y-12">
                     <motion.section initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-                      <DashboardHeader project={projectInfo} projectId={projectId} />
+                      <DashboardHeader project={projectInfo} projectId={projectId} items={currentItems} />
                     </motion.section>
                     <motion.section initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: 0.1 }}>
                       <ChartsSection weeklyData={weeklyExecution} categoryData={categoryExecution} />
@@ -255,12 +271,7 @@ function DashboardContent() {
                 </div>
               } />
 
-              <Route path="/patterns" element={
-                <div className="flex-1 overflow-y-auto p-8 custom-scrollbar bg-[#f5f5f7]">
-                  <h2 className="text-[24px] font-semibold text-[#1d1d1f] tracking-tight">패턴 탐지</h2>
-                  <p className="text-[#86868b] text-[15px] mt-1">시계열·관계 기반 이상징후 자동 탐지 (구현 예정)</p>
-                </div>
-              } />
+              <Route path="/patterns" element={<PatternDetectionView items={currentItems} />} />
             </Routes>
           </motion.div>
         </AnimatePresence>

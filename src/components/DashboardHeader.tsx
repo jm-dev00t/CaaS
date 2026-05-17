@@ -2,7 +2,7 @@ import { Card, CardContent } from "./ui/card";
 import { Progress } from "./ui/progress";
 import { Badge } from "./ui/badge";
 import { Wallet, Calendar, User, FileText, FileDown, Plus } from "lucide-react";
-import { ProjectInfo } from "../types/dashboard";
+import { ProjectInfo, AuditItem } from "../types/dashboard";
 import { Button } from "./ui/button";
 import { useState } from "react";
 import { NewEntrySheet } from "./NewEntrySheet";
@@ -10,9 +10,10 @@ import { NewEntrySheet } from "./NewEntrySheet";
 interface DashboardHeaderProps {
   project: ProjectInfo;
   projectId: string;
+  items?: AuditItem[];
 }
 
-export function DashboardHeader({ project, projectId }: DashboardHeaderProps) {
+export function DashboardHeader({ project, projectId, items }: DashboardHeaderProps) {
   const [isNewEntryOpen, setIsNewEntryOpen] = useState(false);
   const usagePercent = (project.budget.used / project.budget.total) * 100;
 

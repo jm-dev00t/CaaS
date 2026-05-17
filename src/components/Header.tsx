@@ -13,7 +13,7 @@ interface HeaderProps {
 }
 
 export function Header({ activeView, onViewChange }: HeaderProps) {
-  const { profile } = useAuth();
+  const { profile, isDemoMode } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -51,7 +51,13 @@ export function Header({ activeView, onViewChange }: HeaderProps) {
         
         <div className="flex items-center gap-4">
           <NotificationCenter />
-          
+
+          {isDemoMode && (
+            <span className="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-[#fff3cd] text-[#856404] rounded-full text-[11px] font-bold border border-[#ffe082]">
+              DEMO
+            </span>
+          )}
+
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
               <p className="text-[14px] font-semibold text-[#1d1d1f] leading-tight">{profile?.displayName || "사용자"}</p>
