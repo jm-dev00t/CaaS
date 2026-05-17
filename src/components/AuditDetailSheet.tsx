@@ -30,7 +30,8 @@ import {
   RefreshCw,
   Clock,
   User,
-  AlertCircle
+  AlertCircle,
+  Zap
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { generateAuditJustification } from "../services/geminiService";
@@ -39,6 +40,7 @@ import { updateAuditStatus, updateAuditReceipt, subscribeToAuditLogs } from "../
 import { explainAuditResult } from "../services/aiService";
 import { findMatchingRegulations, formatCitation } from "../services/regulationService";
 import ReactMarkdown from "react-markdown";
+import { AgentTraceModal } from "./AgentTraceModal";
 
 interface AuditDetailSheetProps {
   item: AuditItem | null;
@@ -57,6 +59,7 @@ export function AuditDetailSheet({ item, isOpen, onClose, autoExplain }: AuditDe
   const [explanation, setExplanation] = useState<string | null>(null);
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isTraceOpen, setIsTraceOpen] = useState(false);
 
   const displayCitations = useMemo(() => {
     if (!item) return [];
@@ -183,6 +186,7 @@ export function AuditDetailSheet({ item, isOpen, onClose, autoExplain }: AuditDe
   const canAppeal = profile?.role === 'admin' || profile?.role === 'researcher';
 
   return (
+    <>
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent className="sm:max-w-xl overflow-y-auto custom-scrollbar border-l border-border bg-background p-0 rounded-l-[40px] shadow-2xl">
         <div className="p-8 space-y-8">
@@ -562,16 +566,23 @@ export function AuditDetailSheet({ item, isOpen, onClose, autoExplain }: AuditDe
 
         <div className="sticky bottom-0 p-8 border-t border-border bg-background/90 backdrop-blur-xl flex flex-row items-center justify-between gap-4">
           <div className="flex gap-2">
-            <Button 
-                variant="ghost" 
+            <Button
+                variant="ghost"
                 size="icon"
                 className="h-12 w-12 rounded-2xl hover:bg-muted"
                 onClick={() => window.print()}
               >
                 <Download className="w-5 h-5 text-muted-foreground" />
             </Button>
+            <Button
+              onClick={() => setIsTraceOpen(true)}
+              className="h-10 bg-[#0066cc] text-white hover:bg-[#0071e3] rounded-full px-5 text-[13px] font-semibold flex items-center gap-2 active:scale-95 transition-all"
+            >
+              <Zap className="w-4 h-4" />
+              AI Trace
+            </Button>
           </div>
-          
+
           <div className="flex gap-3">
             {canAppeal && item.status !== "정상" && (
               <Button 
@@ -587,5 +598,11 @@ export function AuditDetailSheet({ item, isOpen, onClose, autoExplain }: AuditDe
         </div>
       </SheetContent>
     </Sheet>
+    <AgentTraceModal
+      item={item}
+      isOpen={isTraceOpen}
+      onClose={() => setIsTraceOpen(false)}
+    />
+    </>
   );
 }
