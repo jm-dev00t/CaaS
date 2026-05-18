@@ -570,7 +570,26 @@ export function AuditDetailSheet({ item, isOpen, onClose, autoExplain }: AuditDe
                 variant="ghost"
                 size="icon"
                 className="h-12 w-12 rounded-2xl hover:bg-muted"
-                onClick={() => window.print()}
+                onClick={() => {
+                  const data = {
+                    id: item.id,
+                    description: item.description,
+                    category: item.category,
+                    amount: item.amount,
+                    date: item.date,
+                    status: item.status,
+                    aiScore: item.aiScore,
+                    aiComment: item.aiComment,
+                    justification: justification ?? '',
+                  };
+                  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `audit-${item.id?.slice(-6)}.json`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
               >
                 <Download className="w-5 h-5 text-muted-foreground" />
             </Button>

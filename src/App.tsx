@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from "react";
-import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { Routes, Route, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Sidebar } from "./components/Sidebar";
 import { Header } from "./components/Header";
 import { DashboardHeader } from "./components/DashboardHeader";
@@ -35,6 +35,7 @@ function DashboardContent() {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
 
   const VIEW_PATH: Record<string, string> = {
     dashboard: '/', settlement: '/settlement', verification: '/verification',
@@ -81,8 +82,12 @@ function DashboardContent() {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    // In a real app, this might trigger a server-side re-scan
-    setTimeout(() => setIsRefreshing(false), 1000);
+    if (isDemoMode) {
+      setItems([...auditItems]);
+      setTimeout(() => setIsRefreshing(false), 500);
+    } else {
+      setTimeout(() => setIsRefreshing(false), 1000);
+    }
   };
 
   const currentItems = Array.from(new Map((items.length > 0 ? items : auditItems).map(item => [item.id, item])).values())
@@ -130,13 +135,26 @@ function DashboardContent() {
               <span className="text-[12px] text-[#86868b] font-medium">또는</span>
               <div className="flex-1 h-px bg-[#e5e5e7]" />
             </div>
-            <Button
-              variant="outline"
-              onClick={enterDemoMode}
-              className="w-full h-12 border-[#0066cc] text-[#0066cc] hover:bg-[#e3f2fd] font-semibold text-[15px] flex items-center justify-center gap-2 rounded-full transition-all active:scale-95"
-            >
-              ✨ 데모로 체험하기
-            </Button>
+            <div className="space-y-2">
+              {[
+                { role: 'researcher', label: '연구원', desc: '정산 등록 및 관리', emoji: '🔬' },
+                { role: 'finance_officer', label: '감사자', desc: '집행 검토 및 승인', emoji: '🔍' },
+                { role: 'admin', label: '관리자', desc: '시스템 모든 권한', emoji: '⚙️' },
+              ].map(({ role, label, desc, emoji }) => (
+                <Button
+                  key={role}
+                  variant="outline"
+                  onClick={() => enterDemoMode(role)}
+                  className="w-full h-12 border-[#d2d2d7] text-[#1d1d1f] hover:bg-[#f5f5f7] hover:border-[#0066cc] font-medium text-[14px] flex items-center justify-between px-5 rounded-2xl transition-all active:scale-95"
+                >
+                  <span className="flex items-center gap-2">
+                    <span>{emoji}</span>
+                    <span className="font-semibold">{label}</span>
+                  </span>
+                  <span className="text-[12px] text-[#86868b]">{desc}</span>
+                </Button>
+              ))}
+            </div>
             <p className="text-[11px] text-[#86868b] text-center mt-3">저장되지 않는 읽기 전용 체험 모드</p>
           </div>
           <div className="mt-10 pt-8 border-t border-[#e5e5e7]">
@@ -186,7 +204,7 @@ function DashboardContent() {
                               <p className="text-[14px] text-[#86868b] font-medium">데이터 동기화 중...</p>
                             </div>
                           ) : (
-                            <AuditFeed items={currentItems} statusFilter={statusFilter} onStatusFilterChange={setStatusFilter} currentUserRole={profile?.role} />
+                            <AuditFeed items={currentItems} statusFilter={statusFilter} onStatusFilterChange={setStatusFilter} currentUserRole={profile?.role} initialSearch={searchParams.get('q') ?? ''} />
                           )}
                         </div>
                       </motion.section>

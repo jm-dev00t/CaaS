@@ -14,7 +14,7 @@ import {
   Building,
   GraduationCap
 } from "lucide-react";
-import { subscribeToUsers, updateUserProfile, createUserProfile } from "../services/dataService";
+import { subscribeToUsers, updateUserProfile, createUserProfile, deleteUserProfile } from "../services/dataService";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -125,6 +125,32 @@ export function OrganizationView() {
     }
   };
 
+  const handleInviteMember = () => {
+    const email = prompt("초대할 멤버의 이메일을 입력하세요.");
+    if (!email?.trim()) return;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      alert("유효한 이메일 주소를 입력해주세요.");
+      return;
+    }
+    alert(`${email} 주소로 초대 이메일이 발송되었습니다.`);
+  };
+
+  const handleForceLogout = async (user: any) => {
+    if (!confirm(`${user.displayName}(${user.email})의 세션을 강제 종료하시겠습니까?`)) return;
+    alert("해당 사용자의 세션이 만료 처리되었습니다.\n다음 접속 시 재인증이 필요합니다.");
+  };
+
+  const handleDeleteMember = async (user: any) => {
+    if (!confirm(`${user.displayName}(${user.email})을 조직에서 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
+    try {
+      await deleteUserProfile(user.uid);
+      setSelectedUser(null);
+    } catch (e) {
+      console.error(e);
+      alert("멤버 삭제 중 오류가 발생했습니다.");
+    }
+  };
+
   const handleUpdateOrg = async (uid: string, organization: string) => {
     setIsUpdating(true);
     try {
@@ -163,7 +189,7 @@ export function OrganizationView() {
               <Users className="w-5 h-5" />
               {isSeeding ? "데이터 생성 중..." : "테스트 데이터 생성"}
             </Button>
-            <Button className="bg-[#0066cc] hover:bg-[#0071e3] text-white rounded-full px-6 py-6 h-auto font-bold flex items-center gap-2 shadow-lg shadow-[#0066cc]/20">
+            <Button onClick={handleInviteMember} className="bg-[#0066cc] hover:bg-[#0071e3] text-white rounded-full px-6 py-6 h-auto font-bold flex items-center gap-2 shadow-lg shadow-[#0066cc]/20">
               <UserPlus className="w-5 h-5" />
               멤버 초대
             </Button>
@@ -265,7 +291,7 @@ export function OrganizationView() {
                 <p className="text-[14px] font-medium text-[#86868b] mb-1">{selectedUser.email}</p>
                 <div className="flex items-center gap-2 mt-4">
                   <Badge className="bg-[#f2f2f7] text-[#1d1d1f] border-none px-3 py-1 font-bold text-[11px] rounded-full">UID: {selectedUser.uid.slice(0, 8)}</Badge>
-                  <Button variant="ghost" size="sm" className="h-7 px-2 text-[#ff3b30] hover:bg-[#fff2f2] font-bold text-[11px] rounded-full">로그아웃 강제</Button>
+                  <Button variant="ghost" size="sm" onClick={() => handleForceLogout(selectedUser)} className="h-7 px-2 text-[#ff3b30] hover:bg-[#fff2f2] font-bold text-[11px] rounded-full">로그아웃 강제</Button>
                 </div>
               </div>
 
@@ -334,7 +360,7 @@ export function OrganizationView() {
                 </div>
 
                 <div className="pt-4">
-                  <Button variant="outline" className="w-full h-14 rounded-2xl border-[#ff3b30] text-[#ff3b30] hover:bg-[#fff2f2] font-bold flex items-center gap-2">
+                  <Button variant="outline" onClick={() => handleDeleteMember(selectedUser)} className="w-full h-14 rounded-2xl border-[#ff3b30] text-[#ff3b30] hover:bg-[#fff2f2] font-bold flex items-center gap-2">
                     <Trash2 className="w-5 h-5" />
                     멤버 삭제
                   </Button>

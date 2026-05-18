@@ -3,9 +3,9 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { findMatchingRegulations, buildRegulationContext, formatCitation } from './regulationService';
 
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY as string | undefined;
+const apiKey = (import.meta.env.VITE_GEMINI_API_KEY || process.env.API_KEY) as string | undefined;
 if (!apiKey) {
-  console.warn('[aiService] VITE_GEMINI_API_KEY 미설정 — AI 기능 비활성화. .env.example 참조.');
+  console.warn('[aiService] API 키 미설정 — VITE_GEMINI_API_KEY(.env) 또는 Google AI Studio 환경 필요');
 }
 const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 

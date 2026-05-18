@@ -9,29 +9,43 @@ interface AuthContextType {
   profile: any | null;
   loading: boolean;
   isDemoMode: boolean;
-  enterDemoMode: () => void;
+  enterDemoMode: (role?: string) => void;
+  logout: () => void;
   updateProfile: (data: any) => Promise<void>;
 }
 
-const DEMO_USER = {
-  uid: 'demo-user-id',
-  email: 'demo@audit-system.com',
-  displayName: '데모 감사자',
-  photoURL: null,
-} as unknown as User;
-
-const DEMO_PROFILE = {
-  uid: 'demo-user-id',
-  email: 'demo@audit-system.com',
-  displayName: '데모 감사자',
-  role: 'auditor',
-  organization: '국가연구개발사업단',
+const DEMO_PROFILES: Record<string, { uid: string; email: string; displayName: string; role: string; organization: string }> = {
+  researcher: {
+    uid: 'demo-researcher-id',
+    email: 'researcher@audit-system.com',
+    displayName: '데모 연구원',
+    role: 'researcher',
+    organization: '국가연구개발사업단',
+  },
+  finance_officer: {
+    uid: 'demo-finance-id',
+    email: 'finance@audit-system.com',
+    displayName: '데모 감사자',
+    role: 'finance_officer',
+    organization: '국가연구개발사업단',
+  },
+  admin: {
+    uid: 'demo-admin-id',
+    email: 'admin@audit-system.com',
+    displayName: '데모 관리자',
+    role: 'admin',
+    organization: '국가연구개발사업단',
+  },
 };
+
+const makeDemoUser = (profile: typeof DEMO_PROFILES[string]) =>
+  ({ uid: profile.uid, email: profile.email, displayName: profile.displayName, photoURL: null }) as unknown as User;
 
 const AuthContext = createContext<AuthContextType>({
   user: null, profile: null, loading: true,
   isDemoMode: false,
   enterDemoMode: () => {},
+  logout: () => {},
   updateProfile: async () => {},
 });
 
@@ -44,10 +58,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [demoMode, setDemoMode] = useState(() =>
     sessionStorage.getItem('demoMode') === 'true'
   );
+  const [demoRole, setDemoRole] = useState(() =>
+    sessionStorage.getItem('demoRole') || 'admin'
+  );
 
-  const enterDemoMode = () => {
+  const enterDemoMode = (role = 'admin') => {
     sessionStorage.setItem('demoMode', 'true');
+    sessionStorage.setItem('demoRole', role);
+    setDemoRole(role);
     setDemoMode(true);
+  };
+
+  const logout = () => {
+    if (demoMode) {
+      sessionStorage.removeItem('demoMode');
+      sessionStorage.removeItem('demoRole');
+      setDemoMode(false);
+    } else {
+      auth.signOut();
+    }
   };
 
   const updateProfile = async (data: any) => {
@@ -87,14 +116,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => unsubscribe();
   }, [demoMode]);
 
-  const effectiveUser = demoMode ? DEMO_USER : user;
-  const effectiveProfile = demoMode ? DEMO_PROFILE : profile;
+  const demoProfile = DEMO_PROFILES[demoRole] ?? DEMO_PROFILES.admin;
+  const effectiveUser = demoMode ? makeDemoUser(demoProfile) : user;
+  const effectiveProfile = demoMode ? demoProfile : profile;
   const effectiveLoading = demoMode ? false : loading;
 
   return (
     <AuthContext.Provider value={{
       user: effectiveUser, profile: effectiveProfile, loading: effectiveLoading,
-      isDemoMode: demoMode, enterDemoMode, updateProfile,
+      isDemoMode: demoMode, enterDemoMode, logout, updateProfile,
     }}>
       {children}
     </AuthContext.Provider>

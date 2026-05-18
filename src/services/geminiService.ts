@@ -1,7 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY as string | undefined;
-if (!apiKey) console.warn('[geminiService] VITE_GEMINI_API_KEY 미설정');
+const apiKey = (import.meta.env.VITE_GEMINI_API_KEY || process.env.API_KEY) as string | undefined;
+if (!apiKey) console.warn('[geminiService] API 키 미설정 — VITE_GEMINI_API_KEY(.env) 또는 Google AI Studio 환경 필요');
 const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
 export async function generateAuditJustification(item: any): Promise<string> {
@@ -28,7 +28,7 @@ export async function generateAuditJustification(item: any): Promise<string> {
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-2.0-flash",
       contents: prompt,
     });
     return response.text || "소명서 생성에 실패했습니다.";

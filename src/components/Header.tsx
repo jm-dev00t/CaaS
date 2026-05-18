@@ -6,6 +6,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "./ui/sheet";
 import { Sidebar } from "./Sidebar";
 import { Button } from "./ui/button";
+import { useNavigate } from "react-router-dom";
 
 interface HeaderProps {
   activeView?: string;
@@ -15,6 +16,15 @@ interface HeaderProps {
 export function Header({ activeView, onViewChange }: HeaderProps) {
   const { profile, isDemoMode } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const navigate = useNavigate();
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && searchValue.trim()) {
+      navigate(`/?q=${encodeURIComponent(searchValue.trim())}`);
+      setSearchValue("");
+    }
+  };
 
   return (
     <header className="h-16 bg-white/80 backdrop-blur-xl border-b border-[#e5e5e7] px-4 md:px-8 flex items-center justify-between sticky top-0 z-30">
@@ -43,8 +53,11 @@ export function Header({ activeView, onViewChange }: HeaderProps) {
       <div className="flex items-center gap-6">
         <div className="relative hidden xl:block">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#86868b]" />
-          <Input 
-            placeholder="통합 검색..." 
+          <Input
+            placeholder="통합 검색... (Enter)"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            onKeyDown={handleSearchKeyDown}
             className="pl-10 h-9 bg-[#f5f5f7] border-none focus:bg-white focus:ring-1 focus:ring-[#d2d2d7] transition-all w-60 text-[13px] rounded-full text-[#1d1d1f] placeholder:text-[#86868b]"
           />
         </div>

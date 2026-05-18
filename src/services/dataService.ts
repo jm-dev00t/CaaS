@@ -437,6 +437,15 @@ export function subscribeToRuleHistory(ruleId: string, callback: (history: any[]
   });
 }
 
+export async function deleteUserProfile(uid: string) {
+  const path = `users/${uid}`;
+  try {
+    await deleteDoc(doc(db, "users", uid));
+  } catch (error) {
+    handleFirestoreError(error, OperationType.DELETE, path);
+  }
+}
+
 export async function deleteRule(id: string) {
   const path = `rules/${id}`;
   try {

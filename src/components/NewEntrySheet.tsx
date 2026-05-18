@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { 
   Sheet, 
   SheetContent, 
@@ -23,6 +24,7 @@ interface NewEntrySheetProps {
 }
 
 export function NewEntrySheet({ isOpen, onClose, projectId }: NewEntrySheetProps) {
+  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStep, setSubmitStep] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -290,10 +292,7 @@ export function NewEntrySheet({ isOpen, onClose, projectId }: NewEntrySheetProps
                      type="button"
                      onClick={() => {
                        onClose();
-                       // We need a way to trigger App's setActiveView
-                       // For now, let's assume the user can find it in the sidebar
-                       // OR we can use a custom event
-                       window.dispatchEvent(new CustomEvent('change-view', { detail: 'receipt-gen' }));
+                       navigate('/receipt-gen');
                      }}
                      className="text-[#0066cc] underline hover:text-[#004499] transition-colors"
                    >

@@ -181,7 +181,16 @@ export function ComplianceGuideView() {
                   </div>
                 </div>
                 <div className="p-8 border-t border-[#f5f5f7]">
-                  <button className="w-full h-14 bg-[#1d1d1f] text-white rounded-2xl flex items-center justify-center gap-2 font-bold text-[15px] hover:bg-black transition-all active:scale-95 shadow-xl shadow-black/10">
+                  <button
+                    onClick={() => {
+                      if (selectedRule?.sourceUrl?.startsWith('http')) {
+                        window.open(selectedRule.sourceUrl, '_blank', 'noopener,noreferrer');
+                      } else {
+                        alert('등록된 원문 링크가 없습니다.');
+                      }
+                    }}
+                    className="w-full h-14 bg-[#1d1d1f] text-white rounded-2xl flex items-center justify-center gap-2 font-bold text-[15px] hover:bg-black transition-all active:scale-95 shadow-xl shadow-black/10"
+                  >
                     <ExternalLink className="w-5 h-5" />
                     관련 법령 전문 보기
                   </button>
@@ -196,11 +205,15 @@ export function ComplianceGuideView() {
                   <h3 className="text-xl font-bold text-[#1d1d1f]">자주 묻는 질문</h3>
                   <div className="space-y-4">
                     {[
-                      "야근 식대 청구 가능 시간은?",
-                      "학회 등록비 정산 시 필요 서류는?",
-                      "연구 재료비와 소모품비의 차이는?"
-                    ].map((q, i) => (
-                      <button key={i} className="w-full p-4 rounded-2xl border border-[#d2d2d7] text-left hover:bg-[#f5f5f7] transition-all group flex items-center justify-between">
+                      { q: "야근 식대 청구 가능 시간은?", keyword: "식대" },
+                      { q: "학회 등록비 정산 시 필요 서류는?", keyword: "학회" },
+                      { q: "연구 재료비와 소모품비의 차이는?", keyword: "소모품" },
+                    ].map(({ q, keyword }, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setSearchTerm(keyword)}
+                        className="w-full p-4 rounded-2xl border border-[#d2d2d7] text-left hover:bg-[#f5f5f7] transition-all group flex items-center justify-between"
+                      >
                         <span className="text-[14px] font-bold text-[#424245]">{q}</span>
                         <ChevronRight className="w-4 h-4 text-[#d2d2d7] group-hover:text-[#0066cc]" />
                       </button>

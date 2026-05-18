@@ -62,20 +62,21 @@ interface AuditFeedProps {
   statusFilter?: string;
   onStatusFilterChange?: (status: string) => void;
   currentUserRole?: string;
+  initialSearch?: string;
 }
 
 type SortKey = 'date' | 'amount' | 'aiScore';
 type SortOrder = 'asc' | 'desc';
 
-export function AuditFeed({ items, statusFilter = "all", onStatusFilterChange, currentUserRole }: AuditFeedProps) {
+export function AuditFeed({ items, statusFilter = "all", onStatusFilterChange, currentUserRole, initialSearch = "" }: AuditFeedProps) {
   const [selectedItem, setSelectedItem] = useState<AuditItem | null>(null);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [autoExplain, setAutoExplain] = useState(false);
-  
+
   const showSubmitter = currentUserRole === 'admin' || currentUserRole === 'finance_officer';
-  
+
   // Filtering states
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [scoreRange, setScoreRange] = useState<[number, number]>([0, 100]);
   

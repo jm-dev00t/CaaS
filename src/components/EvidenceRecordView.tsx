@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { AuditDetailSheet } from "./AuditDetailSheet";
 import { 
   History, 
   Search, 
@@ -25,6 +26,22 @@ interface EvidenceRecordViewProps {
 export function EvidenceRecordView({ items }: EvidenceRecordViewProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
+
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+
+  const handleDownloadAll = () => {
+    const targets = items.filter(i => !!i.receiptUrl);
+    if (targets.length === 0) {
+      alert("다운로드할 증빙 자료가 없습니다.");
+      return;
+    }
+    targets.forEach((item, idx) => {
+      const a = document.createElement('a');
+      a.href = item.receiptUrl!;
+      a.download = `${item.id}_${item.description.slice(0, 10)}.png`;
+      setTimeout(() => { document.body.appendChild(a); a.click(); document.body.removeChild(a); }, idx * 300);
+    });
+  };
 
   const evidenceItems = items.filter(item => !!item.receiptUrl);
   
@@ -53,9 +70,9 @@ export function EvidenceRecordView({ items }: EvidenceRecordViewProps) {
               실시간으로 아카이브되는 모든 지출 증빙 자료를 통합 관리합니다.
             </p>
           </div>
-          <Button className="bg-white border-[#d2d2d7] text-[#1d1d1f] hover:bg-[#f5f5f7] rounded-full px-6 py-6 h-auto font-bold flex items-center gap-2">
+          <Button onClick={handleDownloadAll} className="bg-white border-[#d2d2d7] text-[#1d1d1f] hover:bg-[#f5f5f7] rounded-full px-6 py-6 h-auto font-bold flex items-center gap-2">
             <Download className="w-5 h-5" />
-            전체 증빙 내려받기 (ZIP)
+            전체 증빙 내려받기
           </Button>
         </div>
 
@@ -100,8 +117,9 @@ export function EvidenceRecordView({ items }: EvidenceRecordViewProps) {
                 animate={{ opacity: 1, scale: 1 }}
                 whileHover={{ y: -5 }}
                 className="group relative"
+                onClick={() => setSelectedItem(item)}
               >
-                <div className="aspect-[3/4] bg-white border border-[#d2d2d7] rounded-[24px] overflow-hidden flex flex-col shadow-sm group-hover:shadow-xl transition-all duration-300 group-hover:border-[#0066cc]/50">
+                <div className="aspect-[3/4] bg-white border border-[#d2d2d7] rounded-[24px] overflow-hidden flex flex-col shadow-sm group-hover:shadow-xl transition-all duration-300 group-hover:border-[#0066cc]/50 cursor-pointer">
                   {/* Receipt Preview */}
                   <div className="flex-1 bg-[#f5f5f7] relative overflow-hidden flex items-center justify-center">
                     {item.receiptUrl ? (
@@ -162,6 +180,12 @@ export function EvidenceRecordView({ items }: EvidenceRecordViewProps) {
           </div>
         )}
       </div>
+
+      <AuditDetailSheet
+        item={selectedItem}
+        isOpen={!!selectedItem}
+        onClose={() => setSelectedItem(null)}
+      />
     </div>
   );
 }

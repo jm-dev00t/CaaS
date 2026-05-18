@@ -30,7 +30,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ className, currentRole }: SidebarProps) {
-  const { user, updateProfile } = useAuth();
+  const { user, updateProfile, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -75,7 +75,7 @@ export function Sidebar({ className, currentRole }: SidebarProps) {
   };
 
   const handleLogout = () => {
-    auth.signOut();
+    logout();
     navigate('/');
   };
 
@@ -135,7 +135,7 @@ export function Sidebar({ className, currentRole }: SidebarProps) {
         </Popover>
       </div>
 
-      <nav className="flex-1 px-4 py-6 space-y-0.5">
+      <nav className="flex-1 px-4 py-6 space-y-0.5 overflow-y-auto custom-scrollbar">
         <div className="px-4 py-2 text-[11px] font-bold uppercase tracking-wider text-[#86868b] mb-1">메뉴</div>
         {navItems.map((item) => {
           if (item.roles && currentRole && !item.roles.includes(currentRole)) return null;
