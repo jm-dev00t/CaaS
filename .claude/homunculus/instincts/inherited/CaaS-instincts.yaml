@@ -1,0 +1,568 @@
+# Instincts generated from https://github.com/jm-dev00t/CaaS
+# Generated: 2026-05-18T06:29:52.953Z
+# Version: 2.0
+# NOTE: This file supplements (does not replace) any existing curated instincts.
+# High-confidence manually curated instincts should be preserved alongside these.
+
+---
+id: CaaS-commit-conventional
+trigger: "when writing a commit message"
+confidence: 0.85
+domain: git
+source: repo-analysis
+source_repo: https://github.com/jm-dev00t/CaaS
+---
+
+# CaaS Commit Conventional
+
+## Action
+
+Use conventional commit format with prefixes: feat, fix, chore, test, ci
+
+## Evidence
+
+- 12 commits analyzed
+- Detected conventional commit pattern
+- Examples: chore: 초기 프로젝트 설정 (CaaS 클론), feat: React Router 기반 URL 라우팅 도입 (P8a)
+
+---
+id: CaaS-commit-length
+trigger: "when writing a commit message"
+confidence: 0.6
+domain: git
+source: repo-analysis
+source_repo: https://github.com/jm-dev00t/CaaS
+---
+
+# CaaS Commit Length
+
+## Action
+
+Keep commit messages concise (~38 characters)
+
+## Evidence
+
+- Average commit message length: 38 chars
+- Based on 12 commits
+
+---
+id: CaaS-naming-files
+trigger: "when creating a new file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/jm-dev00t/CaaS
+---
+
+# CaaS Naming Files
+
+## Action
+
+Use camelCase naming convention
+
+## Evidence
+
+- Analyzed file naming patterns in repository
+- Dominant pattern: camelCase
+
+---
+id: CaaS-import-relative
+trigger: "when importing modules"
+confidence: 0.75
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/jm-dev00t/CaaS
+---
+
+# CaaS Import Relative
+
+## Action
+
+Use relative imports for project files
+
+## Evidence
+
+- Import analysis shows relative import pattern
+- Example: import { x } from '../lib/x'
+
+---
+id: CaaS-export-style
+trigger: "when exporting from a module"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/jm-dev00t/CaaS
+---
+
+# CaaS Export Style
+
+## Action
+
+Prefer named exports
+
+## Evidence
+
+- Export pattern analysis
+- Dominant style: named
+
+---
+id: CaaS-arch-type-based
+trigger: "when adding new code"
+confidence: 0.8
+domain: architecture
+source: repo-analysis
+source_repo: https://github.com/jm-dev00t/CaaS
+---
+
+# CaaS Arch Type Based
+
+## Action
+
+Place code in the appropriate type folder (components/, services/, utils/, etc.)
+
+## Evidence
+
+- Type-based module organization detected
+- Folders: components, contexts, data, services, types
+
+---
+id: CaaS-test-colocate
+trigger: "when writing tests"
+confidence: 0.85
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/jm-dev00t/CaaS
+---
+
+# CaaS Test Colocate
+
+## Action
+
+Place test file next to the source file (e.g., Button.test.tsx next to Button.tsx)
+
+## Evidence
+
+- Colocated test pattern detected
+- Tests live alongside source files
+
+---
+id: CaaS-workflow-feature-development
+trigger: "when implementing a new feature"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/jm-dev00t/CaaS
+---
+
+# CaaS Workflow Feature Development
+
+## Action
+
+Follow the feature-development workflow:
+1. Add feature implementation
+2. Add tests for feature
+3. Update documentation
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~18x per month
+- Files: src/*, src/components/*, src/contexts/*
+
+---
+id: CaaS-workflow-feature-implementation-with-service-and-component
+trigger: "when doing feature implementation with service and component"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/jm-dev00t/CaaS
+---
+
+# CaaS Workflow Feature Implementation With Service And Component
+
+## Action
+
+Follow the feature-implementation-with-service-and-component workflow:
+1. Create or update a service file in src/services/
+2. Create or update a component file in src/components/
+3. Optionally update or create a type definition in src/types/ or a data file in src/data/
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: src/services/*.ts, src/components/*.tsx, src/types/*.ts
+
+---
+id: CaaS-workflow-feature-implementation-with-package-update
+trigger: "when doing feature implementation with package update"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/jm-dev00t/CaaS
+---
+
+# CaaS Workflow Feature Implementation With Package Update
+
+## Action
+
+Follow the feature-implementation-with-package-update workflow:
+1. Update package.json and package-lock.json to add or change dependencies
+2. Implement or update feature in src/components/ or src/services/
+3. Optionally update configuration files (e.g., vite.config.ts)
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: package.json, package-lock.json, src/components/*.tsx
+
+---
+id: CaaS-workflow-unit-test-addition-for-service-or-utility
+trigger: "when doing unit test addition for service or utility"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/jm-dev00t/CaaS
+---
+
+# CaaS Workflow Unit Test Addition For Service Or Utility
+
+## Action
+
+Follow the unit-test-addition-for-service-or-utility workflow:
+1. Create or update test files in src/services/*.test.ts or src/utils/*.test.ts
+2. Update package.json and package-lock.json if new test dependencies are needed
+3. Optionally update test configuration (e.g., vite.config.ts)
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: src/services/*.test.ts, src/utils/*.test.ts, package.json
+
+---
+id: CaaS-workflow-feature-enhancement-or-bugfix-touching-multiple-components-and-services
+trigger: "when doing feature enhancement or bugfix touching multiple components and services"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/jm-dev00t/CaaS
+---
+
+# CaaS Workflow Feature Enhancement Or Bugfix Touching Multiple Components And Services
+
+## Action
+
+Follow the feature-enhancement-or-bugfix-touching-multiple-components-and-services workflow:
+1. Update multiple files in src/components/
+2. Update related files in src/services/
+3. Update context or data files as needed (e.g., src/contexts/, src/data/)
+4. Optionally update main entry point (src/App.tsx)
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: src/components/*.tsx, src/services/*.ts, src/contexts/*.ts(x)
+
+---
+id: caas-instinct-file-naming-camelCase
+trigger: "When creating or renaming a file in the codebase"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: jm-dev00t/CaaS
+---
+
+# Caas Instinct File Naming CamelCase
+
+## Action
+
+Use camelCase for file names
+
+## Evidence
+
+- Pattern in src/components/Header.tsx
+- Pattern in src/services/patternDetection.ts
+
+---
+id: caas-instinct-function-naming-camelCase
+trigger: "When defining a function"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: jm-dev00t/CaaS
+---
+
+# Caas Instinct Function Naming CamelCase
+
+## Action
+
+Use camelCase for function names
+
+## Evidence
+
+- Pattern in src/utils/patternMatcher.ts
+- Pattern in src/services/ragService.ts
+
+---
+id: caas-instinct-class-naming-PascalCase
+trigger: "When defining a class"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: jm-dev00t/CaaS
+---
+
+# Caas Instinct Class Naming PascalCase
+
+## Action
+
+Use PascalCase for class names
+
+## Evidence
+
+- Pattern in src/components/Sidebar.tsx
+- Pattern in src/components/Header.tsx
+
+---
+id: caas-instinct-constant-naming-SCREAMING_SNAKE_CASE
+trigger: "When defining a constant"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: jm-dev00t/CaaS
+---
+
+# Caas Instinct Constant Naming SCREAMING_SNAKE_CASE
+
+## Action
+
+Use SCREAMING_SNAKE_CASE for constant names
+
+## Evidence
+
+- Pattern in src/types/constants.ts
+
+---
+id: caas-instinct-import-style-relative
+trigger: "When importing modules within the project"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: jm-dev00t/CaaS
+---
+
+# Caas Instinct Import Style Relative
+
+## Action
+
+Use relative import paths
+
+## Evidence
+
+- Pattern in src/components/Sidebar.tsx
+- Pattern in src/services/patternDetection.ts
+
+---
+id: caas-instinct-export-style-named
+trigger: "When exporting functions, classes, or constants"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: jm-dev00t/CaaS
+---
+
+# Caas Instinct Export Style Named
+
+## Action
+
+Use named exports
+
+## Evidence
+
+- Pattern in src/services/ragService.ts
+- Pattern in src/utils/patternMatcher.ts
+
+---
+id: caas-instinct-test-location-colocated
+trigger: "When adding tests for a service or utility"
+confidence: 0.9
+domain: testing
+source: repo-analysis
+source_repo: jm-dev00t/CaaS
+---
+
+# Caas Instinct Test Location Colocated
+
+## Action
+
+Place test files next to the implementation, using the .test.ts suffix
+
+## Evidence
+
+- Pattern in src/services/*.test.ts
+- Pattern in src/utils/*.test.ts
+
+---
+id: caas-instinct-test-naming-convention
+trigger: "When naming a test file"
+confidence: 0.9
+domain: testing
+source: repo-analysis
+source_repo: jm-dev00t/CaaS
+---
+
+# Caas Instinct Test Naming Convention
+
+## Action
+
+Name test files as <module>.test.ts or <module>.test.tsx
+
+## Evidence
+
+- Pattern in src/services/patternDetection.test.ts
+- Pattern in src/utils/patternMatcher.test.ts
+
+---
+id: caas-instinct-test-update-package-on-new-deps
+trigger: "When adding new test dependencies"
+confidence: 0.9
+domain: testing
+source: repo-analysis
+source_repo: jm-dev00t/CaaS
+---
+
+# Caas Instinct Test Update Package On New Deps
+
+## Action
+
+Update package.json and package-lock.json accordingly
+
+## Evidence
+
+- Seen in commits updating package.json and package-lock.json with test files
+- Pattern in unit-test-addition-for-service-or-utility workflow
+
+---
+id: caas-instinct-git-conventional-commits
+trigger: "When writing a commit message"
+confidence: 0.9
+domain: git
+source: repo-analysis
+source_repo: jm-dev00t/CaaS
+---
+
+# Caas Instinct Git Conventional Commits
+
+## Action
+
+Use conventional commit format: <type>: <description> (<optional ticket/issue>)
+
+## Evidence
+
+- feat: React Router 기반 URL 라우팅 도입 (P8a)
+- fix: Vite env var 접두사 수정 및 API 키 보안 문서화 (P7)
+- test: 패턴 탐지 및 규정 서비스 유닛 테스트 추가 (P8b)
+
+---
+id: caas-instinct-git-commit-length
+trigger: "When writing a commit message"
+confidence: 0.8
+domain: git
+source: repo-analysis
+source_repo: jm-dev00t/CaaS
+---
+
+# Caas Instinct Git Commit Length
+
+## Action
+
+Keep commit messages concise, averaging around 38 characters
+
+## Evidence
+
+- Average commit length: 38
+- Pattern in commit examples
+
+---
+id: caas-instinct-feature-service-component
+trigger: "When adding a new feature requiring both backend logic and frontend display"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: jm-dev00t/CaaS
+---
+
+# Caas Instinct Feature Service Component
+
+## Action
+
+Create or update a service in src/services/ and a component in src/components/, optionally updating src/types/ or src/data/
+
+## Evidence
+
+- Workflow: feature-implementation-with-service-and-component
+- Files: src/services/*.ts, src/components/*.tsx, src/types/*.ts, src/data/*.ts
+
+---
+id: caas-instinct-feature-package-update
+trigger: "When implementing a feature that depends on a new or updated package"
+confidence: 0.85
+domain: workflow
+source: repo-analysis
+source_repo: jm-dev00t/CaaS
+---
+
+# Caas Instinct Feature Package Update
+
+## Action
+
+Update package.json and package-lock.json, implement or update feature in src/components/ or src/services/, optionally update vite.config.ts
+
+## Evidence
+
+- Workflow: feature-implementation-with-package-update
+- Files: package.json, package-lock.json, src/components/*.tsx, src/services/*.ts, vite.config.ts
+
+---
+id: caas-instinct-add-unit-test-service-utility
+trigger: "When adding or improving test coverage for a service or utility"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: jm-dev00t/CaaS
+---
+
+# Caas Instinct Add Unit Test Service Utility
+
+## Action
+
+Create or update test files in src/services/*.test.ts or src/utils/*.test.ts, update package.json and package-lock.json if needed, optionally update vite.config.ts
+
+## Evidence
+
+- Workflow: unit-test-addition-for-service-or-utility
+- Files: src/services/*.test.ts, src/utils/*.test.ts, package.json, package-lock.json, vite.config.ts
+
+---
+id: caas-instinct-multifile-bugfix-enhancement
+trigger: "When fixing a bug or enhancing a feature that affects several parts of the app"
+confidence: 0.85
+domain: workflow
+source: repo-analysis
+source_repo: jm-dev00t/CaaS
+---
+
+# Caas Instinct Multifile Bugfix Enhancement
+
+## Action
+
+Update multiple files in src/components/, update related files in src/services/, update context or data files as needed, optionally update src/App.tsx
+
+## Evidence
+
+- Workflow: feature-enhancement-or-bugfix-touching-multiple-components-and-services
+- Files: src/components/*.tsx, src/services/*.ts, src/contexts/*.ts(x), src/data/*.ts, src/App.tsx
+
